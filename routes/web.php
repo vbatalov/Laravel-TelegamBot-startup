@@ -13,6 +13,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get("register", [\App\Http\Controllers\Controller::class, "register"]);
+Route::post("bot", [\App\Http\Controllers\Controller::class, "index"]);

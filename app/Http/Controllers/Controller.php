@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Traits\InlineKeyboard;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
@@ -13,21 +15,33 @@ use Throwable;
 class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
+    use InlineKeyboard;
 
     /**
      * @var Client
      */
-    private Client $client;
+    protected Client $client;
     /**
      * @var BotApi
      */
-    private BotApi $bot;
+    protected BotApi $bot;
+
+    /** @var User  */
+    protected User $user;
+
+    protected string $cid;
+    protected mixed $username;
+    protected mixed $firstname;
+    protected mixed $lastname;
+    protected mixed $text;
 
     public function __construct()
     {
         $token = env("BOT_API");
         $this->bot = new BotApi("$token", null);
         $this->client = new Client($token, null);
+
+        $this->user = new User();
     }
 
     /** Register Webhook */
@@ -55,14 +69,17 @@ class Controller extends BaseController
             $commands = new Command();
             $commands->list();
 
-            $callback_command = new Callback();
-            $callback_command->callback();
-
-            $messages = new Message();
-            $messages->messagesList();
+//            $callback_command = new Callback();
+//            $callback_command->callback();
+//
+//            $messages = new Message();
+//            $messages->messagesList();
 
         } catch (Throwable $e) {
-            \Log::error($e->getMessage());
+            $message = $e->getMessage();
+            $line = $e->getLine();
+            $file = $e->getFile();
+            \Log::error("$message as line $line in file $file");
         }
     }
 }
